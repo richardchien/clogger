@@ -100,6 +100,6 @@ void log_base(int level, const char *tag, const char *msg, va_list ap) {
         print_now_time();
         printf(" %c/%s: ", log_level_ch, tag);
         vprintf(msg, ap);
-        putchar('\n');
+        printf(KNRM "\n");
     }
 }
