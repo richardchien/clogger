@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <stdio.h>
+#include <string.h>
 
 #define KNRM "\x1B[0m"
 #define KRED "\x1B[31m"
@@ -24,40 +25,40 @@ void set_log_level(LogLevel level) {
 
 void print_now_time();
 
-void log_base(int level, const char *tag, const char *msg, va_list ap);
+void log_base(int level, const char *file, int line, const char *tag, const char *msg, va_list ap);
 
-void log_v(const char *tag, const char *msg, ...) {
+void log_v_real(const char *file, int line, const char *tag, const char *msg, ...) {
     va_list ap;
     va_start(ap, msg);
-    log_base(LV_VERBOSE, tag, msg, ap);
+    log_base(LV_VERBOSE, file, line, tag, msg, ap);
     va_end(ap);
 }
 
-void log_d(const char *tag, const char *msg, ...) {
+void log_d_real(const char *file, int line, const char *tag, const char *msg, ...) {
     va_list ap;
     va_start(ap, msg);
-    log_base(LV_DEBUG, tag, msg, ap);
+    log_base(LV_DEBUG, file, line, tag, msg, ap);
     va_end(ap);
 }
 
-void log_i(const char *tag, const char *msg, ...) {
+void log_i_real(const char *file, int line, const char *tag, const char *msg, ...) {
     va_list ap;
     va_start(ap, msg);
-    log_base(LV_INFO, tag, msg, ap);
+    log_base(LV_INFO, file, line, tag, msg, ap);
     va_end(ap);
 }
 
-void log_w(const char *tag, const char *msg, ...) {
+void log_w_real(const char *file, int line, const char *tag, const char *msg, ...) {
     va_list ap;
     va_start(ap, msg);
-    log_base(LV_WARNING, tag, msg, ap);
+    log_base(LV_WARNING, file, line, tag, msg, ap);
     va_end(ap);
 }
 
-void log_e(const char *tag, const char *msg, ...) {
+void log_e_real(const char *file, int line, const char *tag, const char *msg, ...) {
     va_list ap;
     va_start(ap, msg);
-    log_base(LV_ERROR, tag, msg, ap);
+    log_base(LV_ERROR, file, line, tag, msg, ap);
     va_end(ap);
 }
 
@@ -67,7 +68,7 @@ void print_now_time() {
     printf("%02d-%02d %02d:%02d:%02d", time.tm_mon, time.tm_mday, time.tm_hour, time.tm_min, time.tm_sec);
 }
 
-void log_base(int level, const char *tag, const char *msg, va_list ap) {
+void log_base(int level, const char *file, int line, const char *tag, const char *msg, va_list ap) {
     char log_level_ch = 0;
     char *color_prefix = "";
     switch (level) {
@@ -98,7 +99,7 @@ void log_base(int level, const char *tag, const char *msg, va_list ap) {
     if (level >= log_level) {
         printf("%sLOG ", color_prefix);
         print_now_time();
-        printf(" %c/%s: ", log_level_ch, tag);
+        printf(" %s:%d %c/%s: ", strrchr(file, '/') ? strrchr(file, '/') + 1 : file, line, log_level_ch, tag);
         vprintf(msg, ap);
         printf(KNRM "\n");
     }
